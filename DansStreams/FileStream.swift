@@ -7,11 +7,15 @@
 
 import Foundation
 
-public struct FileInputStream : InputStream {
+public class FileInputStream : InputStream {
 	var file: UnsafeMutablePointer<FILE>
 	
 	public init(contentsOf path: String) {
 		self.file = fopen(path, "rb")
+	}
+	
+	deinit {
+		fclose(file)
 	}
 	
 	public func hasData(count: Int) -> Bool {
@@ -21,30 +25,33 @@ public struct FileInputStream : InputStream {
 		return (endpos - oldpos) > count
 	}
 	
-	public mutating func read(count: Int) async -> Data? {
+	public func read(count: Int) async throws -> Data {
 		var result = Data(count: count)
-		let readCount = result.withUnsafeMutableBytes { (buffer: UnsafeMutableRawBufferPointer) in
+		let readCount = result.withUnsafeMutableBytes { (buffer: UnsafeMutableRawBufferPointer) -> Int in
 			fread(buffer.baseAddress, 1, count, file)
 		}
-		if result.count != readCount {
-			result.count = readCount
-		}
+		if result.count != readCount { throw StreamError.endOfStream }
 		return result
 	}
 	
 }
 
-public struct FileOutputStream : OutputStream {
+public class FileOutputStream : OutputStream {
 	var file: UnsafeMutablePointer<FILE>
 
 	public init(contentsOf path: String) {
 		self.file = fopen(path, "wb")
 	}
+	
+	deinit {
+		fclose(file)
+	}
 
-	public mutating func write(data: Data) async {
-		data.withUnsafeBytes { (rawBuffer : UnsafeRawBufferPointer) -> Void in
+	public func write(data: Data) async throws {
+		let writtenBytes = data.withUnsafeBytes { (rawBuffer : UnsafeRawBufferPointer) -> Int in
 			fwrite(rawBuffer.baseAddress, 1, rawBuffer.count, file)
 		}
+		if writtenBytes != data.count { throw StreamError.endOfStream }
 		fflush(file)
 	}
 	

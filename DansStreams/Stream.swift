@@ -7,16 +7,25 @@
 
 import Foundation
 
+enum StreamError: Error {
+	/// Either all of stream read, or stream is full and can't write anymore.
+	case endOfStream
+	/// Couldn't decode the given data as the desired text encoding, or couldn't encode the string to write in the requested encoding.
+	case textEncodingUnsuitable
+	/// Can't fit the given string into the stream with the given length indicator.
+	case stringTooLong
+}
+
 /// A stream that allows sequentially reading from a given source of bytes.
-public protocol InputStream {
+public protocol InputStream: AnyObject {
 	/// Is there currently any data on this stream?
 	var hasData: Bool { get }
 	
 	func hasData(count: Int) -> Bool
 	
-	mutating func read(count: Int) async -> Data?
+	func read(count: Int) async throws -> Data
 	
-	mutating func skip(count: Int) async
+	func skip(count: Int) async throws
 }
 
 public extension InputStream {
@@ -25,15 +34,15 @@ public extension InputStream {
 		return hasData(count: 1)
 	}
 	
-	mutating func skip(count: Int) async {
-		_ = await read(count: count)
+	func skip(count: Int) async throws {
+		_ = try await read(count: count)
 	}
 	
 }
 
 /// A stream that allows appending to a given container of bytes.
-public protocol OutputStream {
-	mutating func write(data: Data) async
+public protocol OutputStream: AnyObject {
+	func write(data: Data) async throws
 }
 
 ///
