@@ -12,8 +12,8 @@ enum StreamError: Error {
 	case endOfStream
 	/// Couldn't decode the given data as the desired text encoding, or couldn't encode the string to write in the requested encoding.
 	case textEncodingUnsuitable
-	/// Can't fit the given string into the stream with the given length indicator.
-	case stringTooLong
+	/// Can't fit the given string or array into the stream with the given length indicator.
+	case dataTooLong
 }
 
 /// A stream that allows sequentially reading from a given source of bytes.
@@ -49,3 +49,14 @@ public protocol OutputStream: AnyObject {
 public protocol Stream : InputStream, OutputStream {
 	
 }
+
+
+public protocol Seekable {
+	
+	var position: Int { get set }
+	
+}
+
+public protocol SeekableInputStream: Seekable, InputStream {}
+public protocol SeekableOutputStream: Seekable, OutputStream {}
+public protocol SeekableStream: Seekable, Stream {}
