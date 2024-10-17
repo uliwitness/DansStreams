@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "DansStreams",
 	platforms: [
-		.macOS(.v10_15), .iOS(.v18)
+		.macOS(.v14), .iOS(.v18)
 	],
     products: [
         .library(
