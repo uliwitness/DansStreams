@@ -14,7 +14,7 @@ public protocol InputStream {
 	
 	func hasData(count: Int) -> Bool
 	
-	mutating func read(count: Int) async -> Data
+	mutating func read(count: Int) async -> Data?
 	
 	mutating func skip(count: Int) async
 }

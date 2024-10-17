@@ -21,7 +21,7 @@ public struct FileInputStream : InputStream {
 		return (endpos - oldpos) > count
 	}
 	
-	public mutating func read(count: Int) async -> Data {
+	public mutating func read(count: Int) async -> Data? {
 		var result = Data(count: count)
 		let readCount = result.withUnsafeMutableBytes { (buffer: UnsafeMutableRawBufferPointer) in
 			fread(buffer.baseAddress, 1, count, file)

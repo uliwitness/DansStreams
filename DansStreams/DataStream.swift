@@ -16,10 +16,13 @@ public struct DataInputStream : InputStream {
 	}
 	
 	public func hasData(count: Int) -> Bool {
-		data.count > offset
+		count > 0 && data.count >= (offset + count)
 	}
 	
-	public mutating func read(count: Int) async -> Data {
+	public mutating func read(count: Int) async -> Data? {
+		if !hasData(count: count) {
+			return nil
+		}
 		let result = data.subdata(in: offset..<(offset + count))
 		offset += count
 		return result

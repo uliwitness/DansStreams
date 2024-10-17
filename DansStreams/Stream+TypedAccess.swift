@@ -7,8 +7,8 @@
 
 extension InputStream {
 	
-	mutating func read<T: FixedWidthInteger>() async -> T {
-		let data = await read(count: MemoryLayout<T>.size)
+	mutating func read<T: FixedWidthInteger>() async -> T? {
+		guard let data = await read(count: MemoryLayout<T>.size) else { return nil }
 		return data.withUnsafeBytes { rawBuffer in
 			rawBuffer.load(as: T.self)
 		}
@@ -17,7 +17,7 @@ extension InputStream {
 	mutating func readCString(encoding: String.Encoding = .utf8) async -> String? {
 		var bytes = [UInt8]()
 		while true {
-			let byte: UInt8 = await read()
+			guard let byte: UInt8 = await read() else { return nil }
 			if byte == 0 { break }
 			bytes.append(byte)
 		}
@@ -25,20 +25,20 @@ extension InputStream {
 	}
 	
 	mutating func readByteCountedString(encoding: String.Encoding = .utf8) async -> String? {
-		let length: UInt8 = await read()
-		let data = await read(count: Int(length))
+		guard let length: UInt8 = await read() else { return nil }
+		guard let data = await read(count: Int(length)) else { return nil }
 		return String(data: data, encoding: encoding)
 	}
 	
 	mutating func read32CountedString(encoding: String.Encoding = .utf8) async -> String? {
-		let length: UInt32 = await read()
-		let data = await read(count: Int(length))
+		guard let length: UInt32 = await read() else { return nil }
+		guard let data = await read(count: Int(length)) else { return nil }
 		return String(data: data, encoding: encoding)
 	}
 	
 	mutating func read64CountedString(encoding: String.Encoding = .utf8) async -> String? {
-		let length: UInt64 = await read()
-		let data = await read(count: Int(length))
+		guard let length: UInt64 = await read() else { return nil }
+		guard let data = await read(count: Int(length)) else { return nil }
 		return String(data: data, encoding: encoding)
 	}
 }
