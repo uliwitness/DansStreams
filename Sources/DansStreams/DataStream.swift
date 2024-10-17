@@ -72,7 +72,7 @@ public class DataOutputStream : SeekableOutputStream {
 }
 
 public class DataStream : SeekableStream {
-	var data: Data
+	public var data: Data
 	public var position: Int = 0
 
 	public init(data: Data = Data()) {
