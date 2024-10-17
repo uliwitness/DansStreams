@@ -26,25 +26,44 @@
 
 import Testing
 @testable import DansStreams
+import Foundation
 
-@Test func testFileStream() async throws {
+@Test func testFileStreamRoundtrip() async throws {
 	let fileOutputStream = FileOutputStream(contentsOf: "Testfile.data")
 	let expectedString = "My name is Gully Foyle, and Terra is my Nation."
 	let dataToWrite = (expectedString + "\0").data(using: .utf8)!
 	try await fileOutputStream.write(data: dataToWrite)
+	try await fileOutputStream.write(UInt32(42))
 	
 	let fileInputStream = FileInputStream(contentsOf: "Testfile.data")
 	let readString = try await fileInputStream.readCString()
 	#expect(readString == expectedString)
+	let readNumber: UInt32 = try await fileInputStream.read()
+	#expect(readNumber == 42)
 }
 
-@Test func testDataStream() async throws
-{
+@Test func testDataInputStream() async throws {
 	let expectedString = "Let's see what this is?"
-	let dataToWrite = (expectedString + "\0").data(using: .utf8)!
+	let dataToWrite = (expectedString + "\0").data(using: .utf8)! + Data([UInt8(111), 0, 0, 0])
 	let dataInputStream = DataInputStream(data: dataToWrite)
 	let readString = try await dataInputStream.readCString()
-
 	#expect(readString == expectedString)
+	
+	let readNum: UInt32 = try await dataInputStream.read()
+	#expect(readNum == 111)
+}
+
+@Test func testDataStreamRoundtrip() async throws {
+	let expectedString = "Let's see what this is?"
+	let dataStream = DataStream()
+	try await dataStream.writeCString(expectedString)
+	try await dataStream.write(Int32(666))
+	
+	dataStream.position = 0
+	let readString = try await dataStream.readCString()
+	#expect(readString == expectedString)
+	
+	let readNum: Int32 = try await dataStream.read()
+	#expect(readNum == 666)
 
 }
