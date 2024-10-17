@@ -66,6 +66,7 @@ public class DataOutputStream : SeekableOutputStream {
 			self.data.count = minLen
 		}
 		self.data.replaceSubrange((data.startIndex + position)..<(data.startIndex + position + data.count), with: data)
+		position += data.count
 	}
 	
 }
@@ -99,6 +100,7 @@ public class DataStream : SeekableStream {
 			self.data.count = minLen
 		}
 		self.data.replaceSubrange((data.startIndex + position)..<(data.startIndex + position + data.count), with: data)
+		position += data.count
 	}
 
 }
