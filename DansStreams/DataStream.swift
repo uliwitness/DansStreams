@@ -24,7 +24,11 @@ public struct DataInputStream : InputStream {
 		offset += count
 		return result
 	}
-	
+
+	public mutating func skip(count: Int) async {
+		offset += count
+	}
+
 }
 
 public struct DataOutputStream : OutputStream {

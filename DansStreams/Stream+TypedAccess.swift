@@ -18,8 +18,8 @@ extension InputStream {
 		var bytes = [UInt8]()
 		while true {
 			let byte: UInt8 = await read()
-			bytes.append(byte)
 			if byte == 0 { break }
+			bytes.append(byte)
 		}
 		return String(bytes: bytes, encoding: encoding)
 	}
